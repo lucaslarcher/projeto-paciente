@@ -1,20 +1,51 @@
-from service.data_models import Paciente, Doenca, Doencas
-from service.banco_de_dados import salvar_paciente_json, carregar_paciente_json
+from src.models.paciente import Paciente, Doenca, DoencaPaciente
+from src.utils.database import inserir_paciente, buscar_paciente_por_id, remover_paciente
 
 
-def test_salvar_paciente():
+def teste_inserir_paciente():
+    paciente_exemplo = Paciente(
+        id="123",
+        chats=["Sintomas de febre", "Dor abdominal"],
+        doencas=[
+            DoencaPaciente(
+                doenca=Doenca(doenca="Cólera", cid="A00"),
+                explicacao="Paciente apresenta sintomas graves de diarreia e desidratação."
+            ),
+            DoencaPaciente(
+                doenca=Doenca(doenca="Gripe", cid="J10"),
+                explicacao="Paciente tem febre e tosse seca há 3 dias."
+            ),
+        ],
+    )
+
+    inserir_paciente(paciente_exemplo)
+
+
+def teste_recuperar_paciente():
+    # Teste de busca
+    paciente_recuperado = buscar_paciente_por_id("123")
+    print(paciente_recuperado)
+
+def teste_remover_paciente():
+
     paciente = Paciente(
         id="123",
         chats=["chat1", "chat2"],
-        doencas=Doencas(doencas=[
-            Doenca(doenca="Hipertensão", cid="I10", explicacao="Pressão alta"),
-            Doenca(doenca="Diabetes", cid="E11", explicacao="Nível alto de açúcar no sangue")
-        ])
+        doencas=[DoencaPaciente(doenca=Doenca(cid="D1", doenca="Diabetes"), explicacao="Explicação diabetes")]
     )
-    salvar_paciente_json(paciente)
+    inserir_paciente(paciente)
+    print("Paciente inserido.")
 
-def test_carregar_paciente():
-    print(carregar_paciente_json("123"))
+    # Agora, tentar remover o paciente
+    remover_paciente("123")
 
-test_salvar_paciente()
-test_carregar_paciente()
+    # Verificar se o paciente foi removido
+    paciente_removido = buscar_paciente_por_id("123")
+    if paciente_removido:
+        print("Paciente ainda encontrado.")
+    else:
+        print("Paciente removido com sucesso.")
+
+teste_inserir_paciente()
+teste_recuperar_paciente()
+teste_remover_paciente()

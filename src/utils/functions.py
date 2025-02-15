@@ -1,3 +1,4 @@
+import os
 import re
 import string
 import pandas as pd
@@ -24,7 +25,10 @@ def limpar_texto(texto):
     return texto.strip()  # Remover espaços extras
 
 def carregar_doencas():
-    doencas_df = pd.read_csv('../data/seed_ciap_raw.csv')
+    # É preciso construir o caminho relativo a esse arquivo
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(script_dir, '../data/seed_ciap_raw.csv')
+    doencas_df = pd.read_csv(csv_path)
 
     doencas_df = doencas_df[
         ['titulo original', 'CID10 mais frequente', 'definição', 'critérios de inclusão', 'critérios de exclusão']]

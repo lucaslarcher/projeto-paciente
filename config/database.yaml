@@ -1,0 +1,3 @@
+database:
+  host: "sqlite:///"
+  database: "projeto_paciente"

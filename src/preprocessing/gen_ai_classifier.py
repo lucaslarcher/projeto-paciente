@@ -1,25 +1,28 @@
 from openai import OpenAI
-from service.data_models import Sintomas, Doenca, Doencas
-import os
-from dotenv import load_dotenv
+from src.models.paciente import Sintomas, Doenca, DoencaPaciente
 import json
 import re
+import yaml
+import os
 
-caminho_env = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env")
-load_dotenv(caminho_env)
+# Recupera o caminho desse arquivo em específico
+script_dir = os.path.dirname(os.path.abspath(__file__))
+config_path = os.path.join(script_dir, '../../config/openai_api.yaml')
+with open(config_path, "r") as arquivo:
+    config = yaml.safe_load(arquivo)
 
-api_key = os.getenv("API_KEY")
-model = os.getenv("MODEL")
+api_key = config["generative_ai"]["api_key"]
+model = config["generative_ai"]["model"]
 
 if not api_key or not model:
-    raise ValueError("API_KEY ou MODEL não foi encontrado no .env")
+    raise ValueError("API_KEY ou MODEL não foi encontrado no arquivo de configuração.")
 
 client = OpenAI(
     api_key=api_key,
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
 
-def extrair_sintomas(chat_texto):
+def extrair_sintomas(chat_texto: str) -> Sintomas:
     prompt = f"""
     Você é um médico especializado em análise de sintomas. Abaixo está um histórico de conversa entre um paciente e um atendente.
 
@@ -43,9 +46,8 @@ def extrair_sintomas(chat_texto):
             ]
         )
 
-        # Verifica se há escolhas e mensagens antes de acessar os atributos
         if response.choices and response.choices[0].message:
-            sintomas_str = response.choices[0].message.content.strip()  # Correção aqui
+            sintomas_str = response.choices[0].message.content.strip()
         else:
             sintomas_str = ""
 
@@ -58,8 +60,7 @@ def extrair_sintomas(chat_texto):
         return Sintomas(sintomas=[])
 
 
-
-def extrair_doencas(sintomas: Sintomas, doencas_criterios: str):
+def extrair_doencas(sintomas: Sintomas, doencas_criterios: str) -> list[DoencaPaciente]:
     sintomas_str = ", ".join(sintomas.sintomas) if sintomas.sintomas else "Nenhum sintoma fornecido"
 
     prompt = f"""
@@ -69,7 +70,7 @@ def extrair_doencas(sintomas: Sintomas, doencas_criterios: str):
     Aqui estão as doenças possíveis, marcadas como D, o CID, marcado como CID, seus critérios de inclusão, marcados como CI, e exclusão, marcados como CE:
     {doencas_criterios}
 
-    Baseado nos sintomas fornecidos e considerando os critérios de inclusão e exclusão, forneça as doenças compatíveis.
+    Baseado nos sintomas fornecidos e considerando os critérios de inclusão e exclusão, forneça as doenças compatíveis levando em consideração que os sintomas juntos costuma qualificar uma doença só e dificilmente uma pessoa tem mais de uma doença que dê os mesmos sintomas, mas pode ter mais de uma doença.
 
     **Formato da resposta (JSON válido obrigatório):**
     {{
@@ -78,14 +79,15 @@ def extrair_doencas(sintomas: Sintomas, doencas_criterios: str):
                 "doenca": "Nome da Doença",
                 "cid": "Código CID",
                 "explicacao": "Explicação breve da relação entre a doença e os sintomas"
-            }}
+            }},
+            ...
         ]
     }}
     """
 
     try:
         response = client.chat.completions.create(
-            model="gemini-2.0-flash",
+            model=model,
             n=1,
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
@@ -103,19 +105,30 @@ def extrair_doencas(sintomas: Sintomas, doencas_criterios: str):
             json_text = json_match.group(0)  # Pega apenas o JSON encontrado
         else:
             print("Erro: Nenhum JSON válido encontrado na resposta da IA.")
-            return Doencas(doencas=[])
+            return []
 
         try:
             parsed_response = json.loads(json_text)
             doencas_lista = parsed_response.get("doencas", [])
         except json.JSONDecodeError:
             print("Erro: A resposta da IA não está em formato JSON válido.")
-            return Doencas(doencas=[])
+            return []
 
-        doencas_formatadas = [Doenca(**doenca) for doenca in doencas_lista]
+        # Cria instâncias de Doenca e DoencaPaciente para todas as doenças retornadas
+        doencas_formatadas = [
+            Doenca(doenca=doenca["doenca"], cid=doenca["cid"]) for doenca in doencas_lista
+        ]
 
-        return Doencas(doencas=doencas_formatadas)
+        doenca_pacientes = [
+            DoencaPaciente(
+                doenca=doenca,
+                explicacao=doenca["explicacao"] if "explicacao" in doenca else "Explicação não fornecida"  # Verifica a existência de "explicacao"
+            )
+            for doenca in doencas_lista
+        ]
+
+        return doenca_pacientes
 
     except Exception as e:
-        print(f"Erro ao processar o chat: {e}")
-        return Doencas(doencas=[])
+        print(f"Erro ao processar os sintomas: {e}")
+        return []

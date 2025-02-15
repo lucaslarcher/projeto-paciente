@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel
 
 class Sintomas(BaseModel):
@@ -6,12 +7,12 @@ class Sintomas(BaseModel):
 class Doenca(BaseModel):
     doenca: str
     cid: str
+
+class DoencaPaciente(BaseModel):
+    doenca: Doenca
     explicacao: str
 
-class Doencas(BaseModel):
-    doencas: list[Doenca]
-
 class Paciente(BaseModel):
-    id : str
-    chats: list[str]
-    doencas: Doencas
+    id: str
+    chats: List[str]
+    doencas: List[DoencaPaciente]

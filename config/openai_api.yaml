@@ -1,0 +1,3 @@
+generative_ai:
+  api_key: "senha"
+  model: "gemini-2.0-flash"
