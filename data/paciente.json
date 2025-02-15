@@ -1,0 +1,20 @@
+{
+    "123": {
+        "chats": [
+            "chat1",
+            "chat2"
+        ],
+        "doencas": [
+            {
+                "doenca": "Hipertensão",
+                "cid": "I10",
+                "explicacao": "Pressão alta"
+            },
+            {
+                "doenca": "Diabetes",
+                "cid": "E11",
+                "explicacao": "Nível alto de açúcar no sangue"
+            }
+        ]
+    }
+}
