@@ -1,5 +1,10 @@
+import os
+
 import pandas as pd
 from src.utils.pipeline import pipeline_entrada_chat
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
 
 def carregar_client_id_chat(id_chat):
     df_clientes = carregar_clientes()
@@ -10,15 +15,18 @@ def carregar_client_id_chat(id_chat):
         return None
 
 def carregar_clientes(arquivo_csv = "../data/clients.csv"):
-    df = pd.read_csv(arquivo_csv)
+    path = os.path.join(script_dir, arquivo_csv)
+    df = pd.read_csv(path)
     return df
 
 def carregar_chats(arquivo_csv = "../data/chat_history.csv"):
-    df = pd.read_csv(arquivo_csv)
+    path = os.path.join(script_dir, arquivo_csv)
+    df = pd.read_csv(path)
     return df
 
 def carregar_client_conditions(arquivo_csv = "../data/client_conditions.csv"):
-    df = pd.read_csv(arquivo_csv)
+    path = os.path.join(script_dir, arquivo_csv)
+    df = pd.read_csv(path)
     return df
 
 
