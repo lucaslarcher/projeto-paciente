@@ -5,7 +5,6 @@ from sqlalchemy import create_engine, Column, String, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from src.models.paciente import Paciente, DoencaPaciente, Doenca
 
-
 # Recupera o caminho desse arquivo em específico
 script_dir = os.path.dirname(os.path.abspath(__file__))
 config_path = os.path.join(script_dir, '../../config/database.yaml')
@@ -26,14 +25,12 @@ Base = declarative_base()
 # Modelo SQLAlchemy para Doenca
 class DoencaModel(Base):
     __tablename__ = "doencas"
-
     cid = Column(String, primary_key=True)
     doenca = Column(String, nullable=False)
 
 # Modelo SQLAlchemy para relação Paciente/Doenca
 class PacienteDoencaModel(Base):
     __tablename__ = "paciente_doenca"
-
     paciente_id = Column(String, ForeignKey("pacientes.id"), primary_key=True)
     doenca_id = Column(String, ForeignKey("doencas.cid"), primary_key=True)
     explicacao = Column(String)  # Explicação é específica de cada paciente
@@ -41,16 +38,13 @@ class PacienteDoencaModel(Base):
 # Modelo SQLAlchemy para Paciente
 class PacienteModel(Base):
     __tablename__ = "pacientes"
-
     id = Column(String, primary_key=True)
     chats = Column(String)  # Chats armazenados como JSON string
-
     # Relacionamento com Doencas através da tabela intermediária
     doencas = relationship("PacienteDoencaModel", backref="paciente")
 
 # Criar tabelas no banco
 Base.metadata.create_all(engine)
-
 # Criar sessão
 SessionLocal = sessionmaker(bind=engine)
 session = SessionLocal()
@@ -63,29 +57,24 @@ def inserir_paciente(paciente):
         if existing_paciente:
             print(f"Paciente com o id {paciente.id} já existe.")
             return  # Se necessário, você pode atualizar o paciente ou tratar de outra forma
-
         # Criar o paciente
         paciente_model = PacienteModel(
             id=paciente.id,
             chats=str(paciente.chats)
         )
-
         # Adicionar doenças associadas ao paciente
         for doenca_paciente in paciente.doencas:
             doenca = doenca_paciente.doenca
             explicacao = doenca_paciente.explicacao
-
             # Verificar se a doença já existe no banco
             doenca_model = session.query(DoencaModel).filter_by(cid=doenca.cid).first()
             if not doenca_model:
                 doenca_model = DoencaModel(cid=doenca.cid, doenca=doenca.doenca)
                 session.add(doenca_model)
-
             # Verificar se a relação paciente/doença já existe
             paciente_doenca_existente = session.query(PacienteDoencaModel).filter_by(
                 paciente_id=paciente.id, doenca_id=doenca.cid
             ).first()
-
             # Se a relação não existir, cria a nova relação
             if not paciente_doenca_existente:
                 paciente_doenca_model = PacienteDoencaModel(
@@ -98,12 +87,10 @@ def inserir_paciente(paciente):
                 # Caso já exista, você pode optar por atualizar a explicação se necessário
                 paciente_doenca_existente.explicacao = explicacao
                 session.add(paciente_doenca_existente)
-
         # Adicionar paciente ao banco e salvar
         session.add(paciente_model)
         session.commit()
         print(f"Paciente com o id {paciente.id} inserido com sucesso.")
-
     except IntegrityError as e:
         session.rollback()
         print(f"Erro de integridade: {e}")
@@ -115,10 +102,8 @@ def inserir_paciente(paciente):
 def buscar_paciente_por_id(paciente_id: str) -> Paciente:
     # Consultar o paciente pelo ID
     paciente_model = session.query(PacienteModel).filter_by(id=paciente_id).first()
-
     if not paciente_model:
         return None  # Paciente não encontrado
-
     # Buscar as doenças associadas ao paciente
     doencas_paciente = (
         session.query(PacienteDoencaModel, DoencaModel)
@@ -126,7 +111,6 @@ def buscar_paciente_por_id(paciente_id: str) -> Paciente:
         .filter(PacienteDoencaModel.paciente_id == paciente_id)
         .all()
     )
-
     # Converter dados para modelo Pydantic
     doencas = [
         DoencaPaciente(
@@ -135,13 +119,11 @@ def buscar_paciente_por_id(paciente_id: str) -> Paciente:
         )
         for relacao_paciente_doenca, doenca_model in doencas_paciente
     ]
-
     paciente = Paciente(
         id=paciente_model.id,
         chats=eval(paciente_model.chats),  # Converter string para lista
         doencas=doencas
     )
-
     return paciente
 
 def remover_paciente(paciente_id: str):

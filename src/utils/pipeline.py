@@ -3,20 +3,30 @@ from src.preprocessing.gen_ai_classifier import extrair_sintomas, extrair_doenca
 from src.utils.functions import limpar_texto, carregar_doencas
 from src.utils.database import inserir_paciente
 
-def pipeline_processamento(chat):
+def pipeline_processamento(chat: str) -> list[DoencaPaciente] | None:
+    #Processa o chat para extrair sintomas e doenças relacionadas.
     try:
         chat_limpo = limpar_texto(chat)
         sintomas: Sintomas = extrair_sintomas(chat_limpo)
-        doencas: list[DoencaPaciente]  = extrair_doencas(sintomas, carregar_doencas())
+        if not sintomas:
+            return None
+        doencas: list[DoencaPaciente] = extrair_doencas(sintomas, carregar_doencas())
+        if not doencas:
+            return None
+
         return doencas
-    except:
+    except Exception as e:
         return None
 
-def pipeline_entrada_chat(chat, id_chat, id_cliente):
+
+def pipeline_entrada_chat(chat: str, id_chat: str, id_cliente: str) -> bool:
+    # Recebe um chat e tenta processá-lo para associar doenças ao paciente.
+
+    print(chat)
     try:
-        doencas: list[DoencaPaciente] = pipeline_processamento(chat)
+        doencas = pipeline_processamento(chat)
         if not doencas:
-            return  False
+            return False
         paciente = Paciente(
             id=id_cliente,
             chats=[id_chat],
@@ -24,5 +34,9 @@ def pipeline_entrada_chat(chat, id_chat, id_cliente):
         )
         inserir_paciente(paciente)
         return True
-    except:
+    except Exception as e:
         return False
+
+
+
+

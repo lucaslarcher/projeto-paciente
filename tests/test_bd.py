@@ -5,7 +5,7 @@ from src.utils.database import inserir_paciente, buscar_paciente_por_id, remover
 def teste_inserir_paciente():
     paciente_exemplo = Paciente(
         id="123",
-        chats=["Sintomas de febre", "Dor abdominal"],
+        chats=["chat001"],
         doencas=[
             DoencaPaciente(
                 doenca=Doenca(doenca="Cólera", cid="A00"),
@@ -30,7 +30,7 @@ def teste_remover_paciente():
 
     paciente = Paciente(
         id="123",
-        chats=["chat1", "chat2"],
+        chats=["chat1"],
         doencas=[DoencaPaciente(doenca=Doenca(cid="D1", doenca="Diabetes"), explicacao="Explicação diabetes")]
     )
     inserir_paciente(paciente)
@@ -47,5 +47,5 @@ def teste_remover_paciente():
         print("Paciente removido com sucesso.")
 
 teste_inserir_paciente()
-teste_recuperar_paciente()
-teste_remover_paciente()
+#teste_recuperar_paciente()
+#teste_remover_paciente()
