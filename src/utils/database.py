@@ -16,8 +16,6 @@ database = config["database"]["database"]
 
 db_path = os.path.join(script_dir, '../data/')  # Caminho correto para o banco de dados
 db_path = os.path.abspath(db_path)  # Resolve o caminho relativo
-print(db_path)
-print(host + db_path + database +".db")
 engine = create_engine(host + db_path + "/" + database + ".db", echo=True)  # Criação do engine do SQLAlchemy
 
 Base = declarative_base()

@@ -20,9 +20,6 @@ def pipeline_processamento(chat: str) -> list[DoencaPaciente] | None:
 
 
 def pipeline_entrada_chat(chat: str, id_chat: str, id_cliente: str) -> bool:
-    # Recebe um chat e tenta processá-lo para associar doenças ao paciente.
-
-    print(chat)
     try:
         doencas = pipeline_processamento(chat)
         if not doencas:

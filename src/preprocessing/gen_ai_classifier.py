@@ -24,7 +24,7 @@ client = OpenAI(
 
 def extrair_sintomas(chat_texto: str) -> Sintomas:
     prompt = f"""
-    Você é um médico especializado em análise de sintomas. Abaixo está um histórico de conversa entre um paciente e um atendente.
+    Você é um médico especializado em análise de sintomas. Abaixo está um histórico de conversa entre um paciente, marcado como p, e um atendente, marcad com o a.
 
     Extraia e retorne apenas os principais sintomas mencionados pelo paciente na conversa.
 
