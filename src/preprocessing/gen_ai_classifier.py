@@ -70,7 +70,7 @@ def extrair_doencas(sintomas: Sintomas, doencas_criterios: str) -> list[DoencaPa
     Aqui estão as doenças possíveis, marcadas como D, o CID, marcado como CID, seus critérios de inclusão, marcados como CI, e exclusão, marcados como CE:
     {doencas_criterios}
 
-    Baseado nos sintomas fornecidos e considerando os critérios de inclusão e exclusão, forneça as doenças compatíveis levando em consideração que os sintomas juntos costuma qualificar uma doença só e dificilmente uma pessoa tem mais de uma doença que dê os mesmos sintomas, mas pode ter mais de uma doença.
+    Baseado nos sintomas fornecidos e considerando os critérios de inclusão e exclusão, forneça uma doença compatível.
 
     **Formato da resposta (JSON válido obrigatório):**
     {{

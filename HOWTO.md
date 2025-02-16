@@ -1,3 +1,19 @@
+# Ajustar a api-key do modelo
+https://ai.google.dev/gemini-api/docs/api-key?hl=pt-br
+config/openai_api.yaml
+
+# Instalar o docker engine
+https://docs.docker.com/engine/install/ubuntu/
+
+# Remover a necessidade do sudo no docker
+https://docs.docker.com/engine/install/linux-postinstall/
+
+# Primeira execução
+docker compose up --build
+
+# Próximas execuções
+docker compose up
+
 # Para iniciar o fastAPI server
     # na raiz do projeto fazer um:
 uvicorn api.main:app --reload
