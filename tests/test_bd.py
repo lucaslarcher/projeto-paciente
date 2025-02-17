@@ -1,10 +1,12 @@
+import pytest
 from src.models.paciente import Paciente, Doenca, DoencaPaciente
 from src.utils.database import inserir_paciente, buscar_paciente_por_id, remover_paciente
 
 
-def teste_inserir_paciente():
-    paciente_exemplo = Paciente(
-        id="123",
+@pytest.fixture
+def paciente_exemplo():
+    return Paciente(
+        id="3",
         chats=["chat001"],
         doencas=[
             DoencaPaciente(
@@ -18,34 +20,27 @@ def teste_inserir_paciente():
         ],
     )
 
+
+def test_inserir_paciente(paciente_exemplo):
     inserir_paciente(paciente_exemplo)
+    paciente_recuperado = buscar_paciente_por_id(paciente_exemplo.id)
+
+    assert paciente_recuperado is not None, "Paciente não foi inserido corretamente"
+    assert paciente_recuperado.id == paciente_exemplo.id, "ID do paciente recuperado não corresponde"
+    assert len(paciente_recuperado.doencas) == len(paciente_exemplo.doencas), "Número de doenças não corresponde"
 
 
-def teste_recuperar_paciente():
-    # Teste de busca
-    paciente_recuperado = buscar_paciente_por_id("123")
-    print(paciente_recuperado)
+def test_recuperar_paciente(paciente_exemplo):
+    inserir_paciente(paciente_exemplo)
+    paciente_recuperado = buscar_paciente_por_id(paciente_exemplo.id)
 
-def teste_remover_paciente():
+    assert paciente_recuperado is not None, "Paciente não encontrado"
+    assert paciente_recuperado.id == "3", "ID do paciente incorreto"
 
-    paciente = Paciente(
-        id="123",
-        chats=["chat1"],
-        doencas=[DoencaPaciente(doenca=Doenca(cid="D1", doenca="Diabetes"), explicacao="Explicação diabetes")]
-    )
-    inserir_paciente(paciente)
-    print("Paciente inserido.")
 
-    # Agora, tentar remover o paciente
-    remover_paciente("123")
+def test_remover_paciente(paciente_exemplo):
+    inserir_paciente(paciente_exemplo)
+    remover_paciente(paciente_exemplo.id)
+    paciente_removido = buscar_paciente_por_id(paciente_exemplo.id)
 
-    # Verificar se o paciente foi removido
-    paciente_removido = buscar_paciente_por_id("123")
-    if paciente_removido:
-        print("Paciente ainda encontrado.")
-    else:
-        print("Paciente removido com sucesso.")
-
-teste_inserir_paciente()
-#teste_recuperar_paciente()
-#teste_remover_paciente()
+    assert paciente_removido is None, "Paciente não foi removido corretamente"

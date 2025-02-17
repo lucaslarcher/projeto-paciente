@@ -20,4 +20,4 @@ RUN chmod +x init.sh
 EXPOSE 8000
 
 # Comando que será executado ao iniciar o container
-CMD ["sh", "-c", "./init.sh && uvicorn api.main:app --host 0.0.0.0 --reload"]
+CMD ["sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --reload"]

@@ -1,35 +1,40 @@
 import json
-
+import pytest
 import requests
 
-def teste_recuperando_paciente_id_api():
-    url_get = "http://127.0.0.1:8000/recuperar_paciente/123"
-    # Realizando a requisição GET
-    response_get = requests.get(url_get)
-    # Verificando a resposta
-    if response_get.status_code == 200:
-        print("Paciente encontrado:", response_get.json())
-    else:
-        print("Erro ao recuperar paciente. Status:", response_get.status_code)
+BASE_URL = "http://127.0.0.1:8000"
 
 
-def teste_processar_chat_api():
-    url = "http://127.0.0.1:8000/processar_chat/"
-    data = {
+@pytest.fixture
+def paciente_id():
+    return 123
+
+
+@pytest.fixture
+def chat_data():
+    return {
         "chat": "paciente: dor de cabeça, febre, espirro",
         "id_chat": "12345",
         "id_cliente": "67890"
     }
 
+
+def test_recuperando_paciente_id_api(paciente_id):
+    url = f"{BASE_URL}/recuperar_paciente/{paciente_id}"
+    response = requests.get(url)
+
+    assert response.status_code == 200, f"Erro ao recuperar paciente. Status: {response.status_code}"
+    assert "id" in response.json(), "Resposta da API não contém ID do paciente"
+
+
+def test_processar_chat_api(chat_data):
+    url = f"{BASE_URL}/processar_chat/"
     headers = {'Content-Type': 'application/json'}
-    response = requests.post(url, data=json.dumps(data), headers=headers)
 
-    print(f"Request sent: {json.dumps(data, indent=2)}")
-    print(f"Response status code: {response.status_code}")
-    if response.status_code == 200:
-        print("Resposta da API:", response.json())
-    else:
-        print(f"Erro {response.status_code}: {response.text}")
+    response = requests.post(url, data=json.dumps(chat_data), headers=headers)
 
-#teste_recuperando_paciente_id_api()
-teste_processar_chat_api()
+    assert response.status_code == 200, f"Erro {response.status_code}: {response.text}"
+    response_json = response.json()
+
+    assert isinstance(response_json, dict), "A resposta da API deve ser um dicionário"
+    assert "resultado" in response_json, "A resposta da API deve conter a chave 'resultado'"
