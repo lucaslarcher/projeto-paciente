@@ -2,7 +2,6 @@ import pytest
 from src.models.paciente import Paciente, Doenca, DoencaPaciente
 from src.utils.database import inserir_paciente, buscar_paciente_por_id, remover_paciente
 
-
 @pytest.fixture
 def paciente_exemplo():
     return Paciente(
@@ -20,7 +19,6 @@ def paciente_exemplo():
         ],
     )
 
-
 def test_inserir_paciente(paciente_exemplo):
     inserir_paciente(paciente_exemplo)
     paciente_recuperado = buscar_paciente_por_id(paciente_exemplo.id)
@@ -29,14 +27,12 @@ def test_inserir_paciente(paciente_exemplo):
     assert paciente_recuperado.id == paciente_exemplo.id, "ID do paciente recuperado não corresponde"
     assert len(paciente_recuperado.doencas) == len(paciente_exemplo.doencas), "Número de doenças não corresponde"
 
-
 def test_recuperar_paciente(paciente_exemplo):
     inserir_paciente(paciente_exemplo)
     paciente_recuperado = buscar_paciente_por_id(paciente_exemplo.id)
 
     assert paciente_recuperado is not None, "Paciente não encontrado"
     assert paciente_recuperado.id == "3", "ID do paciente incorreto"
-
 
 def test_remover_paciente(paciente_exemplo):
     inserir_paciente(paciente_exemplo)

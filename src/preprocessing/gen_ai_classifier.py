@@ -24,7 +24,7 @@ client = OpenAI(
 
 def extrair_sintomas(chat_texto: str) -> Sintomas:
     prompt = f"""
-    Você é um médico especializado em análise de sintomas. Abaixo está um histórico de conversa entre um paciente, marcado como p, e um atendente, marcad com o a.
+    Você é um médico especializado em análise de sintomas. Abaixo está um histórico de conversa entre um paciente e um atendente.
 
     Extraia e retorne apenas os principais sintomas mencionados pelo paciente na conversa.
 
@@ -132,3 +132,5 @@ def extrair_doencas(sintomas: Sintomas, doencas_criterios: str) -> list[DoencaPa
     except Exception as e:
         print(f"Erro ao processar os sintomas: {e}")
         return []
+
+print(extrair_sintomas("paciente: estou dor no corpo e dor de cabeça. Meu estômago doi tmabém."))

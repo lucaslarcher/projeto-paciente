@@ -1,17 +1,20 @@
 import pytest
 from src.utils.pipeline import pipeline_processamento, pipeline_entrada_chat
+from src.models.paciente import DoencaPaciente
 
-
-@pytest.mark.parametrize("chat_input, expected_substring", [
-    ("paciente: estou sentindo hiperidrose, suores noturnos e problemas de transpiração", "hiperidrose"),
-    ("paciente: estou com febre e tosse", "febre"),
+@pytest.mark.parametrize("chat_input", [
+    "paciente: estou sentindo hiperidrose, suores noturnos e problemas de transpiração",
+    "paciente: estou com febre e tosse",
 ])
-def test_pipeline_processamento(chat_input, expected_substring):
+def test_pipeline_processamento(chat_input):
     resultado = pipeline_processamento(chat_input)
 
-    assert isinstance(resultado, str), "O resultado não é uma string"
-    assert expected_substring in resultado, f"O resultado esperado deveria conter '{expected_substring}'"
+    # Verificar se o resultado é uma lista
+    assert isinstance(resultado, list), "O resultado não é uma lista"
 
+    # Verificar se todos os elementos da lista são instâncias de DoencaPaciente
+    assert all(isinstance(doenca, DoencaPaciente) for doenca in
+               resultado), "Os elementos da lista não são instâncias de DoencaPaciente"
 
 @pytest.mark.parametrize("chat_input, id_chat, id_cliente", [
     ("paciente: estou sentindo hiperidrose, suores noturnos e problemas de transpiração", "122", "333333"),
@@ -20,7 +23,5 @@ def test_pipeline_processamento(chat_input, expected_substring):
 def test_pipeline_entrada_chat(chat_input, id_chat, id_cliente):
     resultado = pipeline_entrada_chat(chat_input, id_chat, id_cliente)
 
-    assert isinstance(resultado, dict), "O resultado não é um dicionário"
-    assert "chat" in resultado and resultado["chat"] == chat_input, "O campo 'chat' não foi processado corretamente"
-    assert "id_chat" in resultado and resultado["id_chat"] == id_chat, "O campo 'id_chat' não corresponde"
-    assert "id_cliente" in resultado and resultado["id_cliente"] == id_cliente, "O campo 'id_cliente' não corresponde"
+    assert isinstance(resultado, bool), "O resultado não é um booleano"
+    assert resultado is True, "O pipeline de entrada do chat deveria retornar True indicando sucesso"
