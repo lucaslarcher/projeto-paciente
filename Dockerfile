@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN python src/utils/start.py
 
 # Tornando o script init.sh executável
-RUN chmod +x init.sh
+#RUN chmod +x init.sh
 
 # Expondo a porta da aplicação
 EXPOSE 8000
