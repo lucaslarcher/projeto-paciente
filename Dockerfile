@@ -11,7 +11,7 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Rodando o script de inicialização dos dados
-RUN python src/utils/start.py
+#RUN python src/utils/start.py
 
 # Tornando o script init.sh executável
 #RUN chmod +x init.sh
